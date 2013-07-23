@@ -1,0 +1,152 @@
+<?php
+
+/**
+ * ProcessWire Image Wrapper Textformatter
+ *
+ * This textformatter wraps images with a container and,
+ * if so configured, outputs image descriptions below
+ * them as captions.
+ *
+ * NOTE: THIS MODULE IS VERY MUCH A BETA AND SHOULDN'T BE
+ * USED IN PRODUCTION ENVIRONMENT.
+ *
+ * @copyright Copyright (c) 2013, Teppo Koivula
+ *
+ * ProcessWire 2.x 
+ * Copyright (C) 2012 by Ryan Cramer 
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ * 
+ * http://processwire.com
+ *
+ */
+
+class TextformatterImageWrapper extends Textformatter implements ConfigurableModule {
+
+    /**
+     * Return module information
+     *
+     * @return array Module info
+     */
+    public static function getModuleInfo() {
+        return array(
+            'title' => __('Image Wrapper'), 
+            'summary' => __('This module wraps img tags within HTML markup and outputs their descriptions as captions. Recommended for use with TinyMCE or CKEditor fields.'),
+            'author' => 'Teppo Koivula',
+            'version' => 001
+        );
+    }
+    
+    /**
+     * Default configuration settings
+     *
+     */
+    protected static $configDefaults = array(
+        'show_captions' => true
+    ); 
+
+    /**
+     * Data as used by the get/set functions
+     *
+     */
+    protected $data = array();
+
+    /**
+     * Set our configuration defaults
+     *
+     */
+    public function __construct() {
+        foreach(self::$configDefaults as $key => $value) {
+            $this->set($key, $value); 
+        }
+    }    
+
+    /**
+     * Text formatting function as used by the Textformatter interface
+     *
+     * Here we look for img tags on first pass using a fast strpos() function. When
+     * found, we do our second pass with preg_match_all and wrap those tags.
+     *
+     * @param string &$str Field content
+     */
+    public function format(&$str) {
+
+        // fast strpos check for img tags
+        if (strpos($str, '<img ') === false) return;
+
+        // comprehensive preg_match_all check + capture matches to $matches
+        if (!preg_match_all('#<img.*? alt="(.*?)".*?>#si', $str, $matches)) return;
+
+        // iterate over found matches
+        foreach($matches[0] as $key => $value) { 
+
+            $caption = "";
+            if ($this->show_captions && $matches[1][$key]) {
+                $caption = "<div class='caption'>{$matches[1][$key]}</div>";
+            }
+
+            $class = "image_wrap";
+            if ($caption) $class .= " with_caption";
+            if (preg_match('# class="(.*?)"#si', $value, $match)) {
+                $class .= " {$match[1]}";
+            }
+
+            $image = "<div class='image'>{$value}</div>";
+
+            $out = "<div class='{$class}'>{$image}{$caption}</div>";
+
+            // replace original tag ($line) with wrapped one ($out)
+            $str = str_replace($value, $out, $str); 
+        }
+    }
+
+    /**
+     * Module configuration screen
+     *
+     * @param array $data
+     * @return InputfieldWrapper
+     */
+    public static function getModuleConfigInputfields(array $data) {
+
+        foreach(self::$configDefaults as $key => $value) {
+            if(!isset($data[$key])) $data[$key] = $value;
+        }
+
+        $fields = new InputfieldWrapper();
+
+        $field = wire('modules')->get('InputfieldCheckbox'); 
+        $field->name = 'show_captions';
+        $field->value = true;
+        if ($data['show_captions']) $field->checked = true;
+        $field->label = __('Show captions?'); 
+        $field->description = __('When checked, image wrappers will also contain image descriptions.');
+        $fields->add($field); 
+
+        return $fields;
+    }
+
+    /**
+     * The following functions are to support the ConfigurableModule interface
+     * since Textformatter does not originate from WireData
+     *
+     */
+
+    public function set($key, $value) {
+        $this->data[$key] = $value; 
+        return $this;
+    }
+
+    public function get($key) {
+        $value = Wire::getFuel($key); 
+        if($value) return $value; 
+        return isset($this->data[$key]) ? $this->data[$key] : null;
+    }
+
+    public function __set($key, $value) {
+        $this->set($key, $value); 
+    }
+
+    public function __get($key) {
+        return $this->get($key);
+    }
+    
+}
