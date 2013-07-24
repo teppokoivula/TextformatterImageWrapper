@@ -14,7 +14,7 @@ class "image_wrap".
 Module setting show_captions (enabled by default) also adds image alt text (if
 one exists) as a caption to the wrapper.
 
-# Markup example
+## Markup example
 
 Basic embedded image `<img class="align_left" alt="Alt text" src="..." />`, when
 processed by this textformatter, becomes wrapped markup like this:
