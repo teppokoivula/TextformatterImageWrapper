@@ -16,17 +16,11 @@ one exists) as a caption to the wrapper.
 
 # Markup example
 
-This basic embedded image ..
+Basic embedded image `<img class="align_left" alt="Alt text" src="..." />`, when
+processed by this textformatter, becomes wrapped markup like this:
 
-``
-<img class="align_left" alt="Alt text" src="..." />
-``
 
-.. becomes wrapped image like this:
-
-´´
-<div class="image_wrap with_caption align_left">
-    <img class="align_left" alt="Alt text" src="..." />
-    <div class="caption">Alt text</div>
-</div>
-´´
+    <div class="image_wrap with_caption align_left">
+        <img class="align_left" alt="Alt text" src="..." />
+        <div class="caption">Alt text</div>
+    </div>
