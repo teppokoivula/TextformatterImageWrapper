@@ -6,9 +6,9 @@ anywhere else for that matter) at your own risk." This approach is also only
 one of many, as discussed in this processwire.com forum thread in more detail:
 http://processwire.com/talk/topic/1344-captions-for-images-in-tinymce/
 
-This textformatter, when applied to fields with HTML content, identifies <img>
-tags and wraps them with a <div> element. This <div> elements gets any classes
-of the <img> element wrapped, class "with_caption" if caption exists + default
+When applied to fields with HTML content, this textformatter catches `<img>`
+tags and wraps them with `<div>` elements. These wrapper elements get classes
+of wrapped `<img>` elements, class "with_caption" if caption exists + default
 class "image_wrap".
 
 Module setting show_captions (enabled by default) also adds image alt text (if
