@@ -28,7 +28,7 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
             'title' => __('Image Wrapper'), 
             'summary' => __('This module wraps img tags within HTML markup and outputs their descriptions as captions. Recommended for use with TinyMCE or CKEditor fields.'),
             'author' => 'Teppo Koivula',
-            'version' => 50,
+            'version' => 51,
         );
     }
     
@@ -73,10 +73,10 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
         if (strpos($str, '<img ') === false) return;
 
         // comprehensive preg_match_all check + capture matches to $matches
-        if (!preg_match_all('/(<p>)?<img.*? alt="(.*?)".*?>(<\/p>)?/si', $str, $matches)) return;
+        if (!preg_match_all('/(?:<p>)?((?:<a.*?>)?<img.*? alt="(.*?)".*?>(?:<\/a>)?)(?:<\/p>)?/si', $str, $matches)) return;
 
         // iterate over found matches
-        foreach($matches[0] as $key => $value) { 
+        foreach($matches[1] as $key => $value) { 
 
             // caption element it's wrapper
             $caption = "";
@@ -85,9 +85,6 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
             }
 
             // image element and it's wrapper
-            $original_value = $value;
-            if ($matches[1][$key]) $value = substr($value, strlen($matches[1][$key]));
-            if ($matches[3][$key]) $value = substr($value, 0, strlen($value)-strlen($matches[3][$key]));
             $image = sprintf($this->markup_image, $value);
 
             // original wrapper class and new (combined) classes
@@ -109,9 +106,9 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
                 $wrapper = preg_replace($pattern, $replacement, $wrapper, 1);
             }
 
-            // replace original tag ($original_value) with wrapped one ($out)
+            // replace original tag with wrapped and trimmed one
             $out = sprintf($wrapper, $image . $caption);
-            $str = str_replace($original_value, $out, $str); 
+            $str = str_replace($matches[0][$key], $out, $str); 
         }
     }
 
