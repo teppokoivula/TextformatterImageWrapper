@@ -28,7 +28,7 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
             'title' => __('Image Wrapper'), 
             'summary' => __('This module wraps img tags within HTML markup and outputs their descriptions as captions. Recommended for use with TinyMCE or CKEditor fields.'),
             'author' => 'Teppo Koivula',
-            'version' => 51,
+            'version' => 52,
         );
     }
     
@@ -73,7 +73,7 @@ class TextformatterImageWrapper extends Textformatter implements ConfigurableMod
         if (strpos($str, '<img ') === false) return;
 
         // comprehensive preg_match_all check + capture matches to $matches
-        if (!preg_match_all('/(?:<p>)?((?:<a.*?>)?<img.*? alt="(.*?)".*?>(?:<\/a>)?)(?:<\/p>)?/si', $str, $matches)) return;
+        if (!preg_match_all('/(?:<p>)?((?:<a [^>]*?>)?<img.*? alt=["\'](.*?)["\'].*?>(?:<\/a>)?)(?:<\/p>)?/si', $str, $matches)) return;
 
         // iterate over found matches
         foreach($matches[1] as $key => $value) { 
